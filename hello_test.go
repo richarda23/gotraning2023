@@ -13,7 +13,6 @@ func TestHello(t *testing.T) {
 		got := Hello("")
 		wanted := "Hello, World"
 		AssertCorrectMessage(t, got, wanted)
-
 	})
 }
 
