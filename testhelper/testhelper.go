@@ -6,6 +6,25 @@ import (
 	"testing"
 )
 
+func AssertError(t testing.TB, err error, got string) {
+	t.Helper()
+
+	if err == nil {
+		t.Errorf("No error thrown")
+	}
+	if err.Error() != got {
+		t.Errorf("expected error %s but got %s", err.Error(), got)
+	}
+}
+
+func AssertNoError(t testing.TB, err error) {
+	t.Helper()
+
+	if err != nil {
+		t.Errorf("got an unexpected error")
+	}
+}
+
 func AssertInteger(t testing.TB, wanted, got int) {
 	t.Helper()
 	if wanted != got {
