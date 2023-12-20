@@ -3,6 +3,7 @@ package arrays
 import (
 	"fmt"
 	"hello/testhelper"
+	"slices"
 	"testing"
 )
 
@@ -38,6 +39,14 @@ func ExampleSumAll() {
 	got := SumAll([]int{1, 2, 3}, []int{6, 7, 8})
 	fmt.Println(got)
 	// Output: [6 21]
+}
+
+func TestSlices(t *testing.T) {
+	a1 := make([]int, 5)
+	a1[0] = 22
+	b1 := slices.Index(a1, 22)
+	testhelper.AssertInteger(t, 0, b1)
+	testhelper.AssertInteger(t, -1, slices.Index(a1, 33))
 }
 
 func TestSumAllTails(t *testing.T) {
