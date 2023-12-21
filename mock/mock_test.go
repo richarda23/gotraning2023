@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"hello/testhelper"
 	"io"
+	"reflect"
 	"testing"
+	"time"
 )
 
 var countDownStart = 3
@@ -16,11 +18,33 @@ type Sleeper interface {
 }
 
 type SpySleeper struct {
-	Calls int
+	Calls []string
 }
 
 func (s *SpySleeper) Sleep() {
-	s.Calls += 1
+	s.Calls = append(s.Calls, "sleep")
+}
+
+func (s *SpySleeper) Write(p []byte) (n int, err error) {
+	s.Calls = append(s.Calls, "write")
+	return
+}
+
+type ConfigurableSleeper struct {
+	duration time.Duration
+	sleep    func(time.Duration)
+}
+
+func (c *ConfigurableSleeper) Sleep() {
+	c.sleep(c.duration)
+}
+
+type SpyTime struct {
+	durationSlept time.Duration
+}
+
+func (s *SpyTime) Sleep(duration time.Duration) {
+	s.durationSlept = duration
 }
 
 func Countdown(w io.Writer, sleeper Sleeper) {
@@ -31,19 +55,47 @@ func Countdown(w io.Writer, sleeper Sleeper) {
 	fmt.Fprintln(w, "Go")
 }
 
+func TestConfigurableSleeper(t *testing.T) {
+	stime := 5 * time.Second
+	spytime := &SpyTime{}
+	sleeper := ConfigurableSleeper{stime, spytime.Sleep}
+	sleeper.Sleep()
+	testhelper.AssertInteger(t, 5, int(spytime.durationSlept.Seconds()))
+}
+
 func TestGreet(t *testing.T) {
-	buffer := bytes.Buffer{}
-	sleeper := &SpySleeper{}
-	Countdown(&buffer, sleeper)
-	if sleeper.Calls != 3 {
-		t.Errorf("sleep was called %d times but expected %d", sleeper.Calls, 3)
-	}
-	got := buffer.String()
-	wanted := `3
+
+	t.Run("prints correct answers", func(t *testing.T) {
+		buffer := bytes.Buffer{}
+		sleeper := &SpySleeper{}
+		Countdown(&buffer, sleeper)
+		if len(sleeper.Calls) != 3 {
+			t.Errorf("sleep was called %d times but expected %d", len(sleeper.Calls), 3)
+		}
+		got := buffer.String()
+		wanted := `3
 2
 1
 Go
 `
-	testhelper.AssertCorrectMessage(t, got, wanted)
+		testhelper.AssertCorrectMessage(t, got, wanted)
+	})
+
+	t.Run("prints correct sequence", func(t *testing.T) {
+		expected := []string{
+			"write",
+			"sleep",
+			"write",
+			"sleep",
+			"write",
+			"sleep",
+			"write",
+		}
+		sleeper := &SpySleeper{}
+		Countdown(sleeper, sleeper)
+		if !reflect.DeepEqual(expected, sleeper.Calls) {
+			t.Errorf("wanted %v but got %v", expected, sleeper.Calls)
+		}
+	})
 
 }

@@ -6,6 +6,16 @@ import (
 	"testing"
 )
 
+func AssertNil[T comparable](t testing.TB, got T) {
+	t.Helper()
+	var nilValue T
+
+	if got != nilValue {
+		t.Errorf("Expected nil but was %v", got)
+	}
+
+}
+
 func AssertError(t testing.TB, err error, got string) {
 	t.Helper()
 
