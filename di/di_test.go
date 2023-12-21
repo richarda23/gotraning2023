@@ -17,5 +17,4 @@ func TestGreet(t *testing.T) {
 	Greet(&b, "Bob")
 	got := b.String()
 	testhelper.AssertCorrectMessage(t, "Hello Bob", got)
-
 }
