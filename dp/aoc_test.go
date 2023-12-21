@@ -19,7 +19,7 @@ func TestParseFile(t *testing.T) {
 	contents, _ := readFile("aoc21data.txt")
 	matrix, _ := parseFile(contents)
 	testhelper.AssertInteger(t, 131, len(matrix))
-	matrix = explore(matrix, 2, 2, distance)
+	explore(&matrix, 2, 2, distance)
 	for _, r := range matrix {
 		fmt.Println(r)
 	}
