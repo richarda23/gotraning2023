@@ -16,7 +16,7 @@ func TestReadFile(t *testing.T) {
 
 func TestParseFile(t *testing.T) {
 	distance := 64
-	contents, _ := readFile("aoc14data.txt")
+	contents, _ := readFile("aoc21data.txt")
 	matrix, _ := parseFile(contents)
 	testhelper.AssertInteger(t, 131, len(matrix))
 	matrix = explore(matrix, 2, 2, distance)
@@ -32,6 +32,6 @@ func TestParseFile(t *testing.T) {
 		}
 	}
 	fmt.Printf("count is %d\n", count)
-	testhelper.AssertInteger(t, 16, count)
+	testhelper.AssertInteger(t, 3751, count)
 
 }
